@@ -1,65 +1,69 @@
+// src/Pages/Quiz.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchQuestions } from "../API";
-import Question from "../components/Question";
+import Question from "../Components/Question";
 
 export default function Quiz() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { category = "culture" } = location.state || {};
 
-  const { category = "culture", amount = 5 } = location.state || {};
-
-  const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const timerRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
-  // Charger les questions
+  // Charger 10 questions aléatoires de la catégorie
   useEffect(() => {
-    const qs = fetchQuestions(category).slice(0, amount);
+    let qs = fetchQuestions(category);
+    // Mélanger les questions pour plus d'aléatoire
+    qs = qs.sort(() => Math.random() - 0.5).slice(0, 10);
     setQuestions(qs);
     setLoading(false);
-    resetTimer();
+    startTimer();
     return () => clearInterval(timerRef.current);
-  }, [category, amount]);
+  }, [category]);
 
   // Timer
-  function resetTimer() {
+  const startTimer = () => {
     clearInterval(timerRef.current);
     setTimeLeft(20);
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
         if (t <= 1) {
           clearInterval(timerRef.current);
-          handleAnswer(null); // Temps écoulé
+          handleAnswer(null); // passe automatiquement si pas de réponse
           return 0;
         }
         return t - 1;
       });
     }, 1000);
-  }
+  };
 
-  // Quand l’utilisateur choisit une réponse
-  function handleAnswer(answer) {
+  const handleAnswer = (answer) => {
     clearInterval(timerRef.current);
-    const q = questions[index];
-    const correct = q.correctAnswer;
-    if (answer === correct) {
-      setScore((s) => s + 1);
+    const current = questions[index];
+
+    if (current && answer === current.correctAnswer) {
+      setScore((prev) => prev + 1);
     }
 
-    const next = index + 1;
-    if (next >= questions.length) {
-      navigate("/results", { state: { score, total: questions.length } });
+    if (index + 1 < questions.length) {
+      setIndex((prev) => prev + 1);
+      startTimer();
     } else {
-      setIndex(next);
-      resetTimer();
+      // Fin du quiz : naviguer vers Results.jsx
+      navigate("/results", {
+        state: { score: score + (answer === current.correctAnswer ? 1 : 0), total: questions.length },
+      });
     }
-  }
+  };
 
   if (loading) return <div className="text-center py-20">Chargement…</div>;
+
   const current = questions[index];
 
   return (
@@ -69,12 +73,16 @@ export default function Quiz() {
         <span>Temps restant : {timeLeft}s</span>
       </div>
 
-      <Question
-        item={current}
-        index={index}
-        total={questions.length}
-        onAnswer={handleAnswer}
-      />
+      {current ? (
+        <Question
+          item={current}
+          index={index}
+          total={questions.length}
+          onAnswer={handleAnswer}
+        />
+      ) : (
+        <div>Aucune question disponible</div>
+      )}
     </div>
   );
 }

@@ -1,14 +1,12 @@
-// src/pages/Home.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [category, setCategory] = useState("9"); // catégorie par défaut : Général Knowledge
-  const [amount, setAmount] = useState(10);      // nombre de questions
+  const [category, setCategory] = useState("culture"); // catégorie par défaut
 
   const handleStart = () => {
-    navigate("/quiz", { state: { category, amount } });
+    navigate("/quiz", { state: { category } });
   };
 
   return (
@@ -22,24 +20,11 @@ export default function Home() {
           onChange={(e) => setCategory(e.target.value)}
           className="w-full p-2 border rounded"
         >
-          <option value="9">Général Knowledge</option>
-          <option value="18">Science : Computer</option>
-          <option value="21">Sports</option>
-          <option value="23">History</option>
-          {/* Ajouter d'autres catégories si besoin */}
+          <option value="culture">Culture</option>
+          <option value="science">Science</option>
+          <option value="technologie">Technologie</option>
+          <option value="politique">Politique</option>
         </select>
-      </div>
-
-      <div className="space-y-2">
-        <label className="block text-gray-700">Nombre de questions :</label>
-        <input
-          type="number"
-          value={amount}
-          min={1}
-          max={50}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          className="w-full p-2 border rounded"
-        />
       </div>
 
       <button
