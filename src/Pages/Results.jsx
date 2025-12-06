@@ -19,7 +19,7 @@ export default function Results() {
 
   return (
     <div className="max-w-xl mx-auto text-center space-y-6">
-      <h2 className="text-2xl font-bold">Résultat du Quiz 🎉</h2>
+      <h2 className="text-2xl font-bold">Résultat du Quiz !</h2>
 
       <p className="text-lg font-semibold">
         Ton score : {score} / {total}
