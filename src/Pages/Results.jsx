@@ -17,9 +17,24 @@ export default function Results() {
     return "📚 Persévère, tu vas t'améliorer !";
   };
 
+  const getImage = () => {
+    const ratio = score / total;
+    if (ratio === 1) return "/assets/results/high.png";
+    if (ratio >= 0.7) return "/assets/results/medium.png";
+    if (ratio >= 0.4) return "/assets/results/low.png";
+    return "/assets/results/low.png";
+  };
+
   return (
     <div className="max-w-xl mx-auto text-center space-y-6">
       <h2 className="text-2xl font-bold">Résultat du Quiz !</h2>
+
+      {/* IMAGE DYNAMIQUE */}
+      <img
+        src={getImage()}
+        alt="Résultat visuel"
+        className="mx-auto w-60 h-60 object-contain drop-shadow-xl"
+      />
 
       <p className="text-lg font-semibold">
         Ton score : {score} / {total}
